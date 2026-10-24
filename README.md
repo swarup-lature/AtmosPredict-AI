@@ -1,43 +1,41 @@
-# AtmosPredict AI — Complete ML + Streamlit Project
+# AtmosPredict-AI
 
-This project separates model development from the user interface:
+AtmosPredict AI is an integrated machine learning project designed for air quality estimation and rainfall prediction. It includes robust data preprocessing pipelines, cross-validation methods, and exploratory visualization tools.
 
-- `AtmosPredict_AI_Machine_Learning.ipynb`: data exploration, model comparisons, evaluation, and the final deployment-export cell.
-- `models/aqi_model.joblib` and `models/rainfall_model.joblib`: trained model bundles exported by the notebook using `joblib`.
-- `app.py`: Streamlit frontend. It **loads the saved models** and does not retrain them.
-- `data/`: the AQI and rainfall CSV datasets.
+---
 
-## Run locally
+## 🚀 Key Components
 
-1. Extract the ZIP and open the project folder in VS Code.
-2. Create/activate a virtual environment if desired.
-3. Install dependencies:
+* **AQI Regression:** 
+  * Estimates overall `AQI Value` using specific pollutant metrics like Carbon Monoxide (`co aqi value`), Ozone (`ozone aqi value`), Nitrogen Dioxide (`no2 aqi value`), and PM2.5 (`pm2.5 aqi value`).
+  * Geographic attributes (`latitude`, `longitude`) are reserved solely for exploratory spatial visualization.
+* **Rainfall Classification:** 
+  * Predicts binary rainfall outcomes (`yes`/`no`) using meteorological properties including pressure, temperatures, dew point, humidity, cloud cover, sunshine, wind direction, and wind speed.
+  * Excludes temporal index fields (like `day`) to maintain reliable weather-driven signals.
+* **Model Pipeline:** Built using robust ensemble and linear approaches (such as XGBoost, Random Forest, Extra Trees, Logistic/Linear Regression) combined with median imputation and standard scaling.
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-4. Open `AtmosPredict_AI_Machine_Learning.ipynb` and run cells from top to bottom. The final section (15) exports the two models into `models/`. Pre-exported model files are included in this package, so you can also start the app directly.
-5. Start the frontend:
+## 📦 Saved Models (`joblib`)
 
-   ```bash
-   streamlit run app.py
-   ```
+The training notebook exports two primary artifact dictionaries using `joblib.dump`:
+* `models/aqi_model.joblib`: Extra Trees regressor pipeline with median imputation.
+* `models/rainfall_model.joblib`: Logistic Regression pipeline with median imputation and standard scaling.
 
-## Model connection
+`app.py` loads these artifacts using `joblib.load` to power the Streamlit UI interface.
 
-The notebook exports two dictionaries using `joblib.dump`:
-- `models/aqi_model.joblib`: Extra Trees regressor pipeline with median imputation.
-- `models/rainfall_model.joblib`: Logistic Regression pipeline with median imputation and standard scaling.
+---
 
-`app.py` loads these using `joblib.load` and passes UI values into each pipeline's `predict`/`predict_proba` methods. If you retrain or change features, rerun the final export cell, then restart the app. Only load joblib files that you trust.
+## ☁️ Deploy on Streamlit Community Cloud
 
-## Deploy on Streamlit Community Cloud
+To deploy this project live:
+1. Push `app.py`, `requirements.txt`, the `models/` directory, and the `data/` directory to your GitHub repository.
+2. In [Streamlit Community Cloud](https://streamlit.io/cloud), create a new app pointing to `app.py` as the main entry point.
 
-Push `app.py`, `requirements.txt`, the `models/` folder, and `data/` folder to a GitHub repository. In Streamlit Community Cloud, create an app using `app.py` as the main file. Include the notebook if you want the training workflow available in the repository.
+---
 
-## Important limitations
+## ⚠️ Important Limitations
 
-- AQI output estimates overall AQI from pollutant-specific AQI values; it is not a future AQI forecast.
-- Rainfall data has 366 observations, so generalization is limited.
-- Metrics shown in the app are held-out evaluation metrics for the deployed model family; the saved deployment model is then fitted on all available rows.
+* **AQI Output:** Estimates overall AQI derived from pollutant-specific values; it is not a forward-looking temporal AQI forecast.
+* **Generalization:** Rainfall data samples are limited, meaning generalization bounds apply.
+* **Evaluation Metrics:** Displayed metrics inside the application reflect held-out validation performance for the deployed model families prior to final refitting on the full dataset.
